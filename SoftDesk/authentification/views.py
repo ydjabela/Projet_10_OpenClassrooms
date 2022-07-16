@@ -1,9 +1,6 @@
 from django.shortcuts import render
-
-# Create your views here.
 from rest_framework.views import APIView
 from rest_framework.response import Response
-
 from authentification.models import User
 from authentification.serializers import UserSerializer
 
