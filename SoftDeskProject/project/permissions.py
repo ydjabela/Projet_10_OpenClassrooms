@@ -14,7 +14,7 @@ class IsAuthor(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if request.method in [SAFE_METHODS, "POST"]:
-                return True
+            return True
         else:
             # Si la method est DELETE/PUT  mais que le contributeur n'est pas l'auteur alors il n'aura pas l'autorisation
             return request.user == obj.user

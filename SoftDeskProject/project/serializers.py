@@ -1,4 +1,4 @@
-from projects.models import Project
+from project.models import Project
 from rest_framework.serializers import ModelSerializer
 
 
