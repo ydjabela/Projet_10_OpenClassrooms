@@ -15,3 +15,5 @@ class UserSerializer(ModelSerializer):
             :return: a hashed version of the password
             """
             return make_password(value)
+
+

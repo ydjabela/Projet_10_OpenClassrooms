@@ -1,6 +1,7 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from . import models
 
+
 class IsAdminAuthenticated(BasePermission):
 
     def has_permission(self, request, view):
@@ -10,8 +11,9 @@ class IsAdminAuthenticated(BasePermission):
 
 class IsAuthor(BasePermission):
     message = "You need to be the author in order to modify or delete."
+
     def has_object_permission(self, request, view, obj):
-        if request.method in [SAFE_METHODS,"POST"]:
+        if request.method in [SAFE_METHODS, "POST"]:
                 return True
         else:
             # Si la method est DELETE/PUT  mais que le contributeur n'est pas l'auteur alors il n'aura pas l'autorisation
@@ -20,6 +22,7 @@ class IsAuthor(BasePermission):
 
 class IsProjectAuthor(BasePermission):
     message = "You can't modify this project if you're not its author."
+
     def has_object_permission(self, request, view, obj):
         contributor = models.Contributor.objects.filter(project__id=view.kwargs["pk"]).get(user__id=request.user.id)
         if request.method in SAFE_METHODS:
