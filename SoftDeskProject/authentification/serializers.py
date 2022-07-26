@@ -13,10 +13,10 @@ class UserSerializer(serializers.ModelSerializer):
                   'date_joined', 'password')
         extra_kwargs = {'password': {'write_only': True}}
 
-    def validate_password(self, value: str) -> str:
-        """
-        Hash value passed by user.
-        :param value: password of a user
-        :return: a hashed version of the password
-        """
-        return make_password(value)
+        def validate_password(self, value: str) -> str:
+            """
+            Hash value passed by user.
+            :param value: password of a user
+            :return: a hashed version of the password
+            """
+            return make_password(value)
