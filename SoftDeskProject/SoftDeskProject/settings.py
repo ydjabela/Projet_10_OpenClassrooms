@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
     'authentification',
     'project',
 ]
@@ -57,8 +58,6 @@ ROOT_URLCONF = 'SoftDeskProject.urls'
 AUTH_USER_MODEL = "authentification.User"
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-    'rest_framework.authentication.SessionAuthentication',
-    'rest_framework.authentication.BasicAuthentication',
     'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
