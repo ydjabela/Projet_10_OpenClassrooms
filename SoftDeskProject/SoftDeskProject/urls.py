@@ -23,7 +23,7 @@ from project.views import ProjectsAPIView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('user/', include('users.urls', namespace='users')),
+    # path('user/', UserAPIView.authenticate_user()),
     path('create/', CreateUserAPIView.as_view()),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/projects/', ProjectsAPIView.as_view()),
