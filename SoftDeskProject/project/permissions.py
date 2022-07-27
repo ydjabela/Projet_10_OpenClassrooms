@@ -3,10 +3,26 @@ from . import models
 
 
 class IsAdminAuthenticated(BasePermission):
-
     def has_permission(self, request, view):
-        # Ne donnons l’accès qu’aux utilisateurs administrateurs authentifiés
-        return bool(request.user and request.user.is_authenticated and request.user.is_superuser)
+        if request.user and request.user.is_authenticated and request.user.is_superuser:
+            return super().has_permission(request, view)
+
+
+class IsContributor(BasePermission):
+    message = "You're not a contributor of this project"
+
+    def has_permission(self, request, view, ):
+        if not view.kwargs:
+            contributor = models.Contributor.objects.filter(user__id=request.user.id)
+        elif "project_pk" in view.kwargs:
+            contributor = models.Contributor.objects.filter(project__id=view.kwargs["project_pk"]).filter(
+                user__id=request.user.id)
+        else:
+            contributor = models.Contributor.objects.filter(project__id=view.kwargs["pk"]).filter(
+                user__id=request.user.id)
+        if contributor.exists():
+            return True
+        return False
 
 
 class IsAuthor(BasePermission):
