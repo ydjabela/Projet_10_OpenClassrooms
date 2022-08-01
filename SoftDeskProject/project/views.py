@@ -6,8 +6,8 @@ from project.permissions import IsAdminAuthenticated, IsAuthor, IsProjectAuthor,
 
 class projectViewset(ModelViewSet):
     serializer_class = ProjectSerializer
-    #permission_classes = [IsContributor, IsProjectAuthor]
+    permission_classes = [IsContributor, IsProjectAuthor]
 
     def get_queryset(self):
         print(self.request.user.id)
-        return Project.objects.filter(contributor__id=self.request.user.id)
+        return Project.objects.filter(author_user__id=self.request.user.id)
