@@ -22,7 +22,6 @@ class CreateUserAPIView(APIView):
 
 
 class UsersAPIView(APIView):
-
     def get(self, *args, **kwargs):
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)

@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
+from project.models import Project, Contributor, Issue, Comment
 from . import models
 
 
@@ -25,25 +26,18 @@ class IsContributor(BasePermission):
         return False
 
 
-class IsAuthor(BasePermission):
-    message = "You need to be the author in order to modify or delete."
-
-    def has_object_permission(self, request, view, obj):
-        if request.method in [SAFE_METHODS, "POST"]:
-            return True
-        else:
-            # Si la method est DELETE/PUT  mais que le contributeur n'est pas l'auteur alors il n'aura pas l'autorisation
-            return request.user == obj.user
-
-
 class IsProjectAuthor(BasePermission):
-    message = "You can't modify this project if you're not its author."
-
-    def has_object_permission(self, request, view, obj):
-        contributor = models.Contributor.objects.filter(project__id=view.kwargs["pk"]).get(user__id=request.user.id)
-        if request.method in SAFE_METHODS:
-            return True
-        elif contributor.role == "AUTHOR":
-            return True
+    def has_permission(self, request, view):
+        user_id = request.user.id
+        if request.resolver_match.kwargs:
+            try:
+                project_id = int(request.resolver_match.kwargs["project_pk"])
+            except KeyError:
+                project_id = int(request.resolver_match.kwargs["pk"])
+            project = Project.objects.get(pk=project_id)
+            if project.author_user_id == user_id:
+                return True
+            else:
+                return False
         else:
-            return False
+            return True
