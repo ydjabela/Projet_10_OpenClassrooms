@@ -14,6 +14,7 @@ class projectViewset(ModelViewSet):
 
         if self.request.method == "GET":
             permission_classes = [
+                IsProjectAuthor(),
                 IsAuthenticated(),
             ]
         elif self.request.method == "DELETE" or self.request.method == "PUT":
