@@ -76,3 +76,55 @@ class ContributorRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
             return response.Response(status=status.HTTP_204_NO_CONTENT)
         except:
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class IssuesListCreateView(generics.ListCreateAPIView):
+    serializer_class = IssueSerializer
+    renderer_classes = [renderers.JSONRenderer]
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "project_id"
+
+    def get_queryset(self):
+        project_id = self.kwargs.get(self.lookup_field)
+        return Issue.objects.filter(
+            project__id__iexact=project_id
+        ).prefetch_related("user")
+
+    def create(self, request, *args, **kwargs):
+        project_id = kwargs[self.lookup_field]
+        desc = request.data["desc"]
+        tag = request.data["tag"]
+        priority = request.data["priority"]
+        status = request.data["status"]
+        author_user = request.data["user_id"]
+        assignee_user = request.data["author_user"]
+        serializer = IssueSerializer(
+            data={"desc": desc, "project": project_id, "tag": tag, "priority": priority, "author_user": author_user, "assignee_user": assignee_user}
+        )
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return response.Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED,
+                headers=headers,
+            )
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class IssuesRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = IssueSerializer
+    renderer_classes = [renderers.JSONRenderer]
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "Issue_id"
+
+    def delete(self, request, *args, **kwargs):
+        project_id = kwargs["project_id"]
+        Issue_id = kwargs[self.lookup_field]
+        try:
+            instance = Issue.objects.get(project__id=project_id, user__id=Issue_id)
+            self.perform_destroy(instance)
+            return response.Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+

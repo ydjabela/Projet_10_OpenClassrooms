@@ -18,7 +18,13 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from project.views import projectViewset, ContributorsListCreateView, ContributorRetrieveDeleteView
+from project.views import (
+    projectViewset,
+    ContributorsListCreateView,
+    ContributorRetrieveDeleteView,
+    IssuesListCreateView,
+    IssuesRetrieveDeleteView
+)
 
 # Ici nous créons notre routeur
 router = routers.SimpleRouter()
@@ -38,6 +44,13 @@ urlpatterns = [
     path(
         "api/projects/<int:project_id>/users/<int:contributor_id>/",
         ContributorRetrieveDeleteView.as_view(),
+        name="project_contributor_detail",
+    ),
+    path("api/projects/<int:project_id>/issues/",
+        IssuesListCreateView.as_view(), name="project_contributor_list",),
+    path(
+        "api/projects/<int:project_id>/issues/<int:contributor_id>/",
+        IssuesRetrieveDeleteView.as_view(),
         name="project_contributor_detail",
     ),
 ]
