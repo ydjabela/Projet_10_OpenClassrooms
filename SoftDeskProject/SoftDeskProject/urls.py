@@ -18,7 +18,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from project.views import projectViewset
+from project.views import projectViewset, ContributorsListCreateView, ContributorRetrieveDeleteView
 
 # Ici nous créons notre routeur
 router = routers.SimpleRouter()
@@ -32,7 +32,13 @@ urlpatterns = [
     path('api/signup/', CreateUserAPIView.as_view()),
     path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/', include(router.urls))
-    # Il faut bien penser à ajouter les urls du router dans la liste des urls disponibles.
+    path('api/', include(router.urls)),
+    path("api/projects/<int:project_id>/users/",
+        ContributorsListCreateView.as_view(), name="project_contributor_list",),
+    path(
+        "api/projects/<int:project_id>/users/<int:contributor_id>/",
+        ContributorRetrieveDeleteView.as_view(),
+        name="project_contributor_detail",
+    ),
 ]
 
