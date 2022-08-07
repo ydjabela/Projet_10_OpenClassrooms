@@ -96,11 +96,12 @@ class IssuesListCreateView(generics.ListCreateAPIView):
         tag = request.data["tag"]
         priority = request.data["priority"]
         status = request.data["status"]
-        author_user = request.data["user_id"]
-        assignee_user = request.data["author_user"]
+        author_user = request.data["author_user"]
+        assignee_user = request.data["assignee_user"]
         serializer = IssueSerializer(
             data={"desc": desc, "project": project_id, "tag": tag, "priority": priority, "author_user": author_user, "assignee_user": assignee_user}
         )
+        print(serializer)
         if serializer.is_valid():
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
