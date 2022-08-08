@@ -111,13 +111,9 @@ class IssuesListCreateView(generics.ListCreateAPIView):
                 "assignee_user": assignee_user
             }
         )
-        print(serializer)
         if serializer.is_valid():
-            print("1111111111111111111111111111111111111")
             self.perform_create(serializer)
-            print("22222222222222222222222222")
             headers = self.get_success_headers(serializer.data)
-            print("333333333333333333")
 
             return response.Response(
                 serializer.data,
@@ -137,7 +133,7 @@ class IssuesRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
         project_id = kwargs["project_id"]
         Issue_id = kwargs[self.lookup_field]
         try:
-            instance = Issue.objects.get(project__id=project_id, user__id=Issue_id)
+            instance = Issue.objects.get(Issue__id=Issue_id, project__id=project_id)
             self.perform_destroy(instance)
             return response.Response(status=status.HTTP_204_NO_CONTENT)
         except:
