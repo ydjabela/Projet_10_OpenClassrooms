@@ -140,3 +140,33 @@ class IssuesRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
         except:
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
+    def update(self, request, *args, **kwargs):
+        project_id = kwargs["project_id"]
+        Issue_id = kwargs[self.lookup_field]
+        title = request.data["title"]
+        desc = request.data["desc"]
+        tag = request.data["tag"]
+        priority = request.data["priority"]
+        status_1 = request.data["status"]
+        author_user = request.data["author_user"]
+        assignee_user = request.data["assignee_user"]
+        partial = kwargs.pop('partial', False)
+        instance = Issue.objects.get(id=Issue_id, project__id=project_id)
+        data = {
+            "title": title,
+            "desc": desc,
+            "tag": tag,
+            "priority": priority,
+            "project": project_id,
+            "status": status_1,
+            "author_user": author_user,
+            "assignee_user": assignee_user
+        }
+        serializer = self.get_serializer(
+            instance,
+            data=data,
+            partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return response.Response(serializer.data)
+
