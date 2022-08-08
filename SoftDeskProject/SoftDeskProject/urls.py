@@ -49,7 +49,7 @@ urlpatterns = [
     path("api/projects/<int:project_id>/issues/",
         IssuesListCreateView.as_view(), name="project_issues_list",),
     path(
-        "api/projects/<int:project_id>/issues/<int:contributor_id>/",
+        "api/projects/<int:project_id>/issues/<int:issues_id>/",
         IssuesRetrieveDeleteView.as_view(),
         name="project_issues_detail",
     ),

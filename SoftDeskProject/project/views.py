@@ -88,23 +88,37 @@ class IssuesListCreateView(generics.ListCreateAPIView):
         project_id = self.kwargs.get(self.lookup_field)
         return Issue.objects.filter(
             project__id__iexact=project_id
-        ).prefetch_related("user")
+        )
 
     def create(self, request, *args, **kwargs):
         project_id = kwargs[self.lookup_field]
+        title = request.data["title"]
         desc = request.data["desc"]
         tag = request.data["tag"]
         priority = request.data["priority"]
-        status = request.data["status"]
+        status_1 = request.data["status"]
         author_user = request.data["author_user"]
         assignee_user = request.data["assignee_user"]
         serializer = IssueSerializer(
-            data={"desc": desc, "project": project_id, "tag": tag, "priority": priority, "author_user": author_user, "assignee_user": assignee_user}
+            data={
+                "title": title,
+                "desc": desc,
+                "tag": tag,
+                "priority": priority,
+                "project": project_id,
+                "status": status_1,
+                "author_user": author_user,
+                "assignee_user": assignee_user
+            }
         )
         print(serializer)
         if serializer.is_valid():
+            print("1111111111111111111111111111111111111")
             self.perform_create(serializer)
+            print("22222222222222222222222222")
             headers = self.get_success_headers(serializer.data)
+            print("333333333333333333")
+
             return response.Response(
                 serializer.data,
                 status=status.HTTP_201_CREATED,
