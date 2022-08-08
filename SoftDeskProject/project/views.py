@@ -133,7 +133,8 @@ class IssuesRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
         project_id = kwargs["project_id"]
         Issue_id = kwargs[self.lookup_field]
         try:
-            instance = Issue.objects.get(Issue__id=Issue_id, project__id=project_id)
+            instance = Issue.objects.get(id=Issue_id, project__id=project_id)
+            print(instance)
             self.perform_destroy(instance)
             return response.Response(status=status.HTTP_204_NO_CONTENT)
         except:

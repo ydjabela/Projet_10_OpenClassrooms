@@ -51,7 +51,7 @@ urlpatterns = [
     path(
         "api/projects/<int:project_id>/issues/<int:Issue_id>/",
         IssuesRetrieveDeleteView.as_view(),
-        name="project_issues_detail",
+        name="project_issue_detail",
     ),
 ]
 
