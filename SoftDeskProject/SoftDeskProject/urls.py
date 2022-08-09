@@ -23,7 +23,9 @@ from project.views import (
     ContributorsListCreateView,
     ContributorRetrieveDeleteView,
     IssuesListCreateView,
-    IssuesRetrieveDeleteView
+    IssuesRetrieveDeleteView,
+    CommentListCreateView,
+    CommentRetrieveDeleteView
 )
 
 # Ici nous créons notre routeur
@@ -52,6 +54,13 @@ urlpatterns = [
         "api/projects/<int:project_id>/issues/<int:Issue_id>/",
         IssuesRetrieveDeleteView.as_view(),
         name="project_issue_detail",
+    ),
+    path("api/projects/<int:project_id>/issues/<int:Issue_id>/comment/",
+        CommentListCreateView.as_view(), name="project_comment_list",),
+    path(
+        "api/projects/<int:project_id>/issues/<int:Issue_id>/comment/<int:comment_id>",
+        CommentRetrieveDeleteView.as_view(),
+        name="project_comment_detail",
     ),
 ]
 

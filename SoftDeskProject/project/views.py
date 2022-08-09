@@ -134,7 +134,6 @@ class IssuesRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
         Issue_id = kwargs[self.lookup_field]
         try:
             instance = Issue.objects.get(id=Issue_id, project__id=project_id)
-            print(instance)
             self.perform_destroy(instance)
             return response.Response(status=status.HTTP_204_NO_CONTENT)
         except:
@@ -170,3 +169,85 @@ class IssuesRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
         self.perform_update(serializer)
         return response.Response(serializer.data)
 
+
+class CommentListCreateView(generics.ListCreateAPIView):
+    serializer_class = CommentSerializer
+    renderer_classes = [renderers.JSONRenderer]
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "Issue_id"
+
+    def get_queryset(self):
+        issue_id = self.kwargs["Issue_id"]
+        return Comment.objects.filter(
+            issue__id__iexact=issue_id
+        ).prefetch_related("user")
+
+    def create(self, request, *args, **kwargs):
+        issue_id = kwargs["Issue_id"]
+        description = request.data["description"]
+        author_user = request.data["author_user"]
+        serializer = CommentSerializer(
+            data={
+                "description": description,
+                "author_user": author_user,
+                "issue": issue_id,
+            }
+        )
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+
+            return response.Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED,
+                headers=headers,
+            )
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CommentRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = CommentSerializer
+    renderer_classes = [renderers.JSONRenderer]
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "Issue_id"
+
+    def delete(self, request, *args, **kwargs):
+        project_id = kwargs["project_id"]
+        Issue_id = kwargs[self.lookup_field]
+        try:
+            instance = Issue.objects.get(id=Issue_id, project__id=project_id)
+            print(instance)
+            self.perform_destroy(instance)
+            return response.Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, *args, **kwargs):
+        project_id = kwargs["project_id"]
+        Issue_id = kwargs[self.lookup_field]
+        title = request.data["title"]
+        desc = request.data["desc"]
+        tag = request.data["tag"]
+        priority = request.data["priority"]
+        status_1 = request.data["status"]
+        author_user = request.data["author_user"]
+        assignee_user = request.data["assignee_user"]
+        partial = kwargs.pop('partial', False)
+        instance = Issue.objects.get(id=Issue_id, project__id=project_id)
+        data = {
+            "title": title,
+            "desc": desc,
+            "tag": tag,
+            "priority": priority,
+            "project": project_id,
+            "status": status_1,
+            "author_user": author_user,
+            "assignee_user": assignee_user
+        }
+        serializer = self.get_serializer(
+            instance,
+            data=data,
+            partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return response.Response(serializer.data)

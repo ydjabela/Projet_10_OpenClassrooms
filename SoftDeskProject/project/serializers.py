@@ -25,4 +25,4 @@ class IssueSerializer(ModelSerializer):
 class CommentSerializer(ModelSerializer):
     class Meta:
         model = Comment
-        fields = ["id", "description", "author_user_id", "issue_id", "created_time"]
+        fields = ["id", "description", "author_user", "issue", "created_time"]
