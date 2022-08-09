@@ -41,24 +41,30 @@ urlpatterns = [
     path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/', include(router.urls)),
-    path("api/projects/<int:project_id>/users/",
-        ContributorsListCreateView.as_view(), name="project_contributor_list",),
+    path(
+        "api/projects/<int:project_id>/users/",
+        ContributorsListCreateView.as_view(),
+        name="project_contributor_list",),
     path(
         "api/projects/<int:project_id>/users/<int:contributor_id>/",
         ContributorRetrieveDeleteView.as_view(),
         name="project_contributor_detail",
     ),
-    path("api/projects/<int:project_id>/issues/",
-        IssuesListCreateView.as_view(), name="project_issues_list",),
+    path(
+        "api/projects/<int:project_id>/issues/",
+        IssuesListCreateView.as_view(),
+        name="project_issues_list",),
     path(
         "api/projects/<int:project_id>/issues/<int:Issue_id>/",
         IssuesRetrieveDeleteView.as_view(),
         name="project_issue_detail",
     ),
-    path("api/projects/<int:project_id>/issues/<int:Issue_id>/comment/",
-        CommentListCreateView.as_view(), name="project_comment_list",),
     path(
-        "api/projects/<int:project_id>/issues/<int:Issue_id>/comment/<int:comment_id>",
+        "api/projects/<int:project_id>/issues/<int:Issue_id>/comment/",
+        CommentListCreateView.as_view(),
+        name="project_comment_list",),
+    path(
+        "api/projects/<int:project_id>/issues/<int:Issue_id>/comment/<int:Comment_id>/",
         CommentRetrieveDeleteView.as_view(),
         name="project_comment_detail",
     ),

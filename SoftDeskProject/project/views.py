@@ -209,41 +209,29 @@ class CommentRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CommentSerializer
     renderer_classes = [renderers.JSONRenderer]
     permission_classes = [permissions.IsAuthenticated]
-    lookup_field = "Issue_id"
+    lookup_field = "Comment_id"
 
     def delete(self, request, *args, **kwargs):
-        project_id = kwargs["project_id"]
-        Issue_id = kwargs[self.lookup_field]
+        comment_id = kwargs[self.lookup_field]
         try:
-            instance = Issue.objects.get(id=Issue_id, project__id=project_id)
-            print(instance)
+            instance = Comment.objects.get(id=comment_id)
             self.perform_destroy(instance)
             return response.Response(status=status.HTTP_204_NO_CONTENT)
         except:
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
-        project_id = kwargs["project_id"]
-        Issue_id = kwargs[self.lookup_field]
-        title = request.data["title"]
-        desc = request.data["desc"]
-        tag = request.data["tag"]
-        priority = request.data["priority"]
-        status_1 = request.data["status"]
+        comment_id = kwargs["Comment_id"]
+        issue_id = kwargs["Issue_id"]
+        description = request.data["description"]
         author_user = request.data["author_user"]
-        assignee_user = request.data["assignee_user"]
         partial = kwargs.pop('partial', False)
-        instance = Issue.objects.get(id=Issue_id, project__id=project_id)
+        instance = Comment.objects.get(id=comment_id)
         data = {
-            "title": title,
-            "desc": desc,
-            "tag": tag,
-            "priority": priority,
-            "project": project_id,
-            "status": status_1,
-            "author_user": author_user,
-            "assignee_user": assignee_user
-        }
+                "description": description,
+                "author_user": author_user,
+                "issue": issue_id,
+            }
         serializer = self.get_serializer(
             instance,
             data=data,
