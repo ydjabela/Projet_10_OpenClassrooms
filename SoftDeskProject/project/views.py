@@ -13,6 +13,7 @@ class projectViewset(viewsets.ModelViewSet):
 
         if self.request.method == "GET":
             permission_classes = [
+                IsContributor(),
                 IsProjectAuthor(),
                 permissions.IsAuthenticated(),
             ]
@@ -221,10 +222,11 @@ class CommentRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
+        connected_user = self.request.user.id
         comment_id = kwargs["Comment_id"]
         issue_id = kwargs["Issue_id"]
         description = request.data["description"]
-        author_user = request.data["author_user"]
+        author_user = connected_user
         partial = kwargs.pop('partial', False)
         instance = Comment.objects.get(id=comment_id)
         data = {

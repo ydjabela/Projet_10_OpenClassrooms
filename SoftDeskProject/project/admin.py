@@ -6,23 +6,23 @@ from project.models import Project, Contributor, Issue, Comment
 
 class ProjectAdmin(admin.ModelAdmin):
     # liste les champs que nous voulons sur l'affichage de la liste
-    list_display = ('title', 'description', 'type', 'author_user')
+    list_display = ('id', 'title', 'description', 'type', 'author_user')
 
 
 class ContributorAdmin(admin.ModelAdmin):
     # liste les champs que nous voulons sur l'affichage de la liste
-    list_display = ('user', 'project', 'permission', 'role')
+    list_display = ('id', 'user', 'project', 'permission', 'role')
 
 
 class IssuesAdmin(admin.ModelAdmin):
     # liste les champs que nous voulons sur l'affichage de la liste
-    list_display = ('title', 'desc', 'tag', 'priority', 'project',
+    list_display = ('id', 'title', 'desc', 'tag', 'priority', 'project',
                     'status', 'author_user', 'assignee_user', 'created_time')
 
 
 class CommentAdmin(admin.ModelAdmin):
     # liste les champs que nous voulons sur l'affichage de la liste
-    list_display = ('description', 'author_user', 'issue', 'created_time')
+    list_display = ('id', 'description', 'author_user', 'issue', 'created_time')
 
 
 admin.site.register(Project, ProjectAdmin)

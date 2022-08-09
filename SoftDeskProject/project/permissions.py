@@ -14,12 +14,12 @@ class IsContributor(BasePermission):
 
     def has_permission(self, request, view, ):
         if not view.kwargs:
-            contributor = models.Contributor.objects.filter(user__id=request.user.id)
+            contributor = Contributor.objects.filter(user__id=request.user.id)
         elif "project_pk" in view.kwargs:
-            contributor = models.Contributor.objects.filter(project__id=view.kwargs["project_pk"]).filter(
+            contributor = Contributor.objects.filter(project__id=view.kwargs["project_pk"]).filter(
                 user__id=request.user.id)
         else:
-            contributor = models.Contributor.objects.filter(project__id=view.kwargs["pk"]).filter(
+            contributor = Contributor.objects.filter(project__id=view.kwargs["pk"]).filter(
                 user__id=request.user.id)
         if contributor.exists():
             return True
@@ -31,7 +31,8 @@ class IsProjectAuthor(BasePermission):
         user_id = request.user.id
         if request.resolver_match.kwargs:
             try:
-                project_id = int(request.resolver_match.kwargs["project_pk"])
+                project_id = int(request.resolver_match.kwargs["project_id"])
+                print(project_id)
             except KeyError:
                 project_id = int(request.resolver_match.kwargs["pk"])
             project = Project.objects.get(pk=project_id)
