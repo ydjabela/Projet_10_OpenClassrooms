@@ -1,7 +1,7 @@
 from rest_framework import viewsets, generics, status, renderers, response, permissions
 from project.models import Project, Contributor, Issue, Comment
 from project.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
-from project.permissions import IsAdminAuthenticated, IsProjectAuthor, IsContributor
+from project.permissions import IsProjectAuthor, IsContributor
 
 
 class projectViewset(viewsets.ModelViewSet):

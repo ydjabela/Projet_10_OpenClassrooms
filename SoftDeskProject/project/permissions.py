@@ -3,12 +3,6 @@ from project.models import Project, Contributor, Issue, Comment
 from . import models
 
 
-class IsAdminAuthenticated(BasePermission):
-    def has_permission(self, request, view):
-        if request.user and request.user.is_authenticated and request.user.is_superuser:
-            return super().has_permission(request, view)
-
-
 class IsContributor(BasePermission):
     message = "You're not a contributor of this project"
 
