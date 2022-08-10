@@ -27,12 +27,13 @@ class IsContributor(BasePermission):
 
 
 class IsProjectAuthor(BasePermission):
+    message = "You're not a author of this project"
+
     def has_permission(self, request, view):
         user_id = request.user.id
         if request.resolver_match.kwargs:
             try:
                 project_id = int(request.resolver_match.kwargs["project_id"])
-                print(project_id)
             except KeyError:
                 project_id = int(request.resolver_match.kwargs["pk"])
             project = Project.objects.get(pk=project_id)

@@ -13,7 +13,6 @@ class projectViewset(viewsets.ModelViewSet):
 
         if self.request.method == "GET":
             permission_classes = [
-                IsContributor(),
                 IsProjectAuthor(),
                 permissions.IsAuthenticated(),
             ]
@@ -33,7 +32,7 @@ class ContributorsListCreateView(generics.ListCreateAPIView):
 
     serializer_class = ContributorSerializer
     renderer_classes = [renderers.JSONRenderer]
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsProjectAuthor]
     lookup_field = "project_id"
 
     def get_queryset(self):
@@ -65,7 +64,7 @@ class ContributorsListCreateView(generics.ListCreateAPIView):
 class ContributorRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ContributorSerializer
     renderer_classes = [renderers.JSONRenderer]
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsProjectAuthor]
     lookup_field = "contributor_id"
 
     def delete(self, request, *args, **kwargs):
@@ -82,7 +81,7 @@ class ContributorRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
 class IssuesListCreateView(generics.ListCreateAPIView):
     serializer_class = IssueSerializer
     renderer_classes = [renderers.JSONRenderer]
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsProjectAuthor]
     lookup_field = "project_id"
 
     def get_queryset(self):
@@ -92,13 +91,14 @@ class IssuesListCreateView(generics.ListCreateAPIView):
         )
 
     def create(self, request, *args, **kwargs):
+        connected_user = self.request.user.id
         project_id = kwargs[self.lookup_field]
         title = request.data["title"]
         desc = request.data["desc"]
         tag = request.data["tag"]
         priority = request.data["priority"]
         status_1 = request.data["status"]
-        author_user = request.data["author_user"]
+        author_user = connected_user
         assignee_user = request.data["assignee_user"]
         serializer = IssueSerializer(
             data={
@@ -127,7 +127,7 @@ class IssuesListCreateView(generics.ListCreateAPIView):
 class IssuesRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = IssueSerializer
     renderer_classes = [renderers.JSONRenderer]
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsProjectAuthor]
     lookup_field = "Issue_id"
 
     def delete(self, request, *args, **kwargs):
@@ -141,6 +141,7 @@ class IssuesRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
+        connected_user = self.request.user.id
         project_id = kwargs["project_id"]
         Issue_id = kwargs[self.lookup_field]
         title = request.data["title"]
@@ -148,7 +149,7 @@ class IssuesRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
         tag = request.data["tag"]
         priority = request.data["priority"]
         status_1 = request.data["status"]
-        author_user = request.data["author_user"]
+        author_user = connected_user
         assignee_user = request.data["assignee_user"]
         partial = kwargs.pop('partial', False)
         instance = Issue.objects.get(id=Issue_id, project__id=project_id)
@@ -174,19 +175,25 @@ class IssuesRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
 class CommentListCreateView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
     renderer_classes = [renderers.JSONRenderer]
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsProjectAuthor]
     lookup_field = "Issue_id"
 
     def get_queryset(self):
+        project_id = self.kwargs.get(self.lookup_field)
+        issued = Issue.objects.filter(
+            project__id__iexact=project_id
+        )
+        print(issued)
         issue_id = self.kwargs["Issue_id"]
         return Comment.objects.filter(
-            issue__id__iexact=issue_id
-        ).prefetch_related("user")
+            issue__id__iexact=issue_id,
+        )
 
     def create(self, request, *args, **kwargs):
         issue_id = kwargs["Issue_id"]
+        connected_user = self.request.user.id
         description = request.data["description"]
-        author_user = request.data["author_user"]
+        author_user = connected_user
         serializer = CommentSerializer(
             data={
                 "description": description,
@@ -209,13 +216,14 @@ class CommentListCreateView(generics.ListCreateAPIView):
 class CommentRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CommentSerializer
     renderer_classes = [renderers.JSONRenderer]
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsProjectAuthor]
     lookup_field = "Comment_id"
 
     def delete(self, request, *args, **kwargs):
         comment_id = kwargs[self.lookup_field]
+        project_id = kwargs["project_id"]
         try:
-            instance = Comment.objects.get(id=comment_id)
+            instance = Comment.objects.get(id=comment_id, project__id=project_id)
             self.perform_destroy(instance)
             return response.Response(status=status.HTTP_204_NO_CONTENT)
         except:
