@@ -176,41 +176,42 @@ class CommentListCreateView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
     renderer_classes = [renderers.JSONRenderer]
     permission_classes = [permissions.IsAuthenticated, IsProjectAuthor]
-    lookup_field = "Issue_id"
 
     def get_queryset(self):
-        project_id = self.kwargs.get(self.lookup_field)
-        issued = Issue.objects.filter(
-            project__id__iexact=project_id
-        )
-        print(issued)
+        project_id = self.kwargs.get("project_id")
         issue_id = self.kwargs["Issue_id"]
+        issued = Issue.objects.get(id=issue_id, project__id__iexact=project_id)
         return Comment.objects.filter(
-            issue__id__iexact=issue_id,
+            issue__id__iexact=issued.id,
         )
 
     def create(self, request, *args, **kwargs):
         issue_id = kwargs["Issue_id"]
-        connected_user = self.request.user.id
-        description = request.data["description"]
-        author_user = connected_user
-        serializer = CommentSerializer(
-            data={
-                "description": description,
-                "author_user": author_user,
-                "issue": issue_id,
-            }
-        )
-        if serializer.is_valid():
-            self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-
-            return response.Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED,
-                headers=headers,
+        project_id = self.kwargs.get("project_id")
+        try:
+            issued = Issue.objects.get(id=issue_id, project__id__iexact=project_id)
+            connected_user = self.request.user.id
+            description = request.data["description"]
+            author_user = connected_user
+            serializer = CommentSerializer(
+                data={
+                    "description": description,
+                    "author_user": author_user,
+                    "issue": issued.id,
+                }
             )
-        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            if serializer.is_valid():
+                self.perform_create(serializer)
+                headers = self.get_success_headers(serializer.data)
+
+                return response.Response(
+                    serializer.data,
+                    status=status.HTTP_201_CREATED,
+                    headers=headers,
+                )
+            return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class CommentRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
@@ -222,8 +223,10 @@ class CommentRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
     def delete(self, request, *args, **kwargs):
         comment_id = kwargs[self.lookup_field]
         project_id = kwargs["project_id"]
+        issue_id = self.kwargs["Issue_id"]
         try:
-            instance = Comment.objects.get(id=comment_id, project__id=project_id)
+            issued = Issue.objects.get(id=issue_id, project__id__iexact=project_id)
+            instance = Comment.objects.get(id=comment_id, issue__id=issued.id)
             self.perform_destroy(instance)
             return response.Response(status=status.HTTP_204_NO_CONTENT)
         except:
@@ -232,20 +235,25 @@ class CommentRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
     def update(self, request, *args, **kwargs):
         connected_user = self.request.user.id
         comment_id = kwargs["Comment_id"]
+        project_id = kwargs["project_id"]
         issue_id = kwargs["Issue_id"]
-        description = request.data["description"]
-        author_user = connected_user
-        partial = kwargs.pop('partial', False)
-        instance = Comment.objects.get(id=comment_id)
-        data = {
-                "description": description,
-                "author_user": author_user,
-                "issue": issue_id,
-            }
-        serializer = self.get_serializer(
-            instance,
-            data=data,
-            partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return response.Response(serializer.data)
+        try:
+            issued = Issue.objects.get(id=issue_id, project__id__iexact=project_id)
+            description = request.data["description"]
+            author_user = connected_user
+            partial = kwargs.pop('partial', False)
+            instance = Comment.objects.get(id=comment_id, issue__id=issued.id)
+            data = {
+                    "description": description,
+                    "author_user": author_user,
+                    "issue": issued.id,
+                }
+            serializer = self.get_serializer(
+                instance,
+                data=data,
+                partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return response.Response(serializer.data)
+        except:
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
