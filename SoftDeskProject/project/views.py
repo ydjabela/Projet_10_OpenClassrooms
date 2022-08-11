@@ -31,6 +31,24 @@ class projectViewset(viewsets.ModelViewSet):
             )
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def update(self, request, *args, **kwargs):
+        author_user = self.request.user.id
+        project_id = int(request.resolver_match.kwargs["pk"])
+        title = request.data["title"]
+        description = request.data["description"]
+        type = request.data["type"]
+
+        partial = kwargs.pop('partial', False)
+        instance = Project.objects.get(id=project_id)
+        data = {"author_user": author_user, "title": title, "description": description, "type": type}
+        serializer = self.get_serializer(
+            instance,
+            data=data,
+            partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return response.Response(serializer.data)
+
 
 class ContributorsListCreateView(generics.ListCreateAPIView):
     """
@@ -39,7 +57,7 @@ class ContributorsListCreateView(generics.ListCreateAPIView):
 
     serializer_class = ContributorSerializer
     renderer_classes = [renderers.JSONRenderer]
-    permission_classes = [permissions.IsAuthenticated, IsProjectAuthor]
+    permission_classes = [permissions.IsAuthenticated, IsContributor]
     lookup_field = "project_id"
     '''
     def get_permissions(self):
