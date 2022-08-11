@@ -27,10 +27,14 @@ class IsProjectAuthor(BasePermission):
         user_id = request.user.id
         if request.resolver_match.kwargs:
             try:
-                project_id = int(request.resolver_match.kwargs["project_id"])
+                project_id = int(request.resolver_match.kwargs["project_pk"])
             except KeyError:
                 project_id = int(request.resolver_match.kwargs["pk"])
-            project = Project.objects.get(pk=project_id)
+            try:
+                project = Project.objects.get(id=project_id)
+            except Project.DoesNotExist:
+                return False
+
             if project.author_user_id == user_id:
                 return True
             else:
