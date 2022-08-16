@@ -1,7 +1,7 @@
 from rest_framework import viewsets, generics, status, renderers, response, permissions
 from project.models import Project, Contributor, Issue, Comment
 from project.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
-from project.permissions import IsProjectAuthor, IsContributor
+from project.permissions import IsProjectAuthor, IsContributor, IsIssueAuthor, IsCommentAuthor
 
 
 class projectViewset(viewsets.ModelViewSet):
@@ -153,7 +153,7 @@ class IssuesListCreateView(generics.ListCreateAPIView):
 class IssuesRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = IssueSerializer
     renderer_classes = [renderers.JSONRenderer]
-    permission_classes = [permissions.IsAuthenticated, IsProjectAuthor]
+    permission_classes = [permissions.IsAuthenticated, IsIssueAuthor]
     lookup_field = "Issue_id"
 
     def delete(self, request, *args, **kwargs):
@@ -201,7 +201,7 @@ class IssuesRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
 class CommentListCreateView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
     renderer_classes = [renderers.JSONRenderer]
-    permission_classes = [permissions.IsAuthenticated, IsProjectAuthor]
+    permission_classes = [permissions.IsAuthenticated, IsContributor]
 
     def get_queryset(self):
         project_id = self.kwargs.get("project_id")
@@ -243,7 +243,7 @@ class CommentListCreateView(generics.ListCreateAPIView):
 class CommentRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CommentSerializer
     renderer_classes = [renderers.JSONRenderer]
-    permission_classes = [permissions.IsAuthenticated, IsProjectAuthor]
+    permission_classes = [permissions.IsAuthenticated, IsCommentAuthor]
     lookup_field = "Comment_id"
 
     def delete(self, request, *args, **kwargs):
