@@ -57,22 +57,9 @@ class ContributorsListCreateView(generics.ListCreateAPIView):
 
     serializer_class = ContributorSerializer
     renderer_classes = [renderers.JSONRenderer]
-    permission_classes = [permissions.IsAuthenticated, IsContributor]
+    permission_classes = [permissions.IsAuthenticated, IsProjectAuthor]
     lookup_field = "project_id"
-    '''
-    def get_permissions(self):
-        permission_classes = [permissions.IsAuthenticated(), IsProjectAuthor]
 
-        if self.request.method == "GET":
-            permission_classes = [
-                IsProjectAuthor(),
-                permissions.IsAuthenticated(),
-            ]
-        elif self.request.method == "DELETE" or self.request.method == "PUT":
-            permission_classes = [IsProjectAuthor(), permissions.IsAuthenticated()]
-
-        return permission_classes
-    '''
     def get_queryset(self):
         project_id = self.kwargs.get(self.lookup_field)
         return Contributor.objects.filter(
@@ -80,8 +67,7 @@ class ContributorsListCreateView(generics.ListCreateAPIView):
         ).prefetch_related("user")
 
     def create(self, request, *args, **kwargs):
-        connected_user = self.request.user.id
-        user_id = connected_user
+        user_id = request.data["user_id"]
         project_id = kwargs[self.lookup_field]
         permission = request.data["permission"]
         role = request.data["role"]
@@ -119,7 +105,9 @@ class ContributorRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
 class IssuesListCreateView(generics.ListCreateAPIView):
     serializer_class = IssueSerializer
     renderer_classes = [renderers.JSONRenderer]
-    permission_classes = [permissions.IsAuthenticated, IsProjectAuthor]
+
+    permission_classes = [permissions.IsAuthenticated, IsContributor]
+    print(IsProjectAuthor, IsContributor)
     lookup_field = "project_id"
 
     def get_queryset(self):

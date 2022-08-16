@@ -14,31 +14,29 @@ class IsContributor(BasePermission):
             except KeyError:
                 project_id = int(request.resolver_match.kwargs["pk"])
             print(project_id)
-            contributor = Contributor.objects.get(project__id=project_id)
-
-            if contributor.user_id == user_id:
-
-                return True
-            else:
+            try:
+                project = Project.objects.get(id=project_id)
+            except Project.DoesNotExist:
+                message = "Project does'nt exist"
                 return False
+            print(project.id)
+            if project.author_user_id == user_id:
+                return True
+            try:
+                contributor = Contributor.objects.get(project__id=project_id, user__id=user_id)
+                if contributor.user_id == user_id:
+                    print(contributor.user_id, user_id)
+                    return True
+                else:
+                    print(contributor.user_id, project.author_user_id, user_id)
+                    return False
+            except Contributor.DoesNotExist:
+                message = "contributor does'nt exist"
+                print(message)
+                return False
+
         else:
             return True
-
-    '''
-    def has_permission(self, request, view, ):
-        if not view.kwargs:
-            contributor = Contributor.objects.filter(user__id=request.user.id)
-        elif "project_id" in view.kwargs:
-            contributor = Contributor.objects.filter(project__id=view.kwargs["project_id"]).filter(
-                user__id=request.user.id)
-        else:
-            contributor = Contributor.objects.filter(project__id=view.kwargs["pk"]).filter(
-                user__id=request.user.id)
-        if contributor.exists():
-            return True
-        return False
-
-    '''
 
 
 class IsProjectAuthor(BasePermission):
@@ -55,10 +53,10 @@ class IsProjectAuthor(BasePermission):
                 project = Project.objects.get(id=project_id)
             except Project.DoesNotExist:
                 message = "Project does'nt exist"
-                return False, message
+                print(message)
+                return False
 
             if project.author_user_id == user_id:
-
                 return True
             else:
                 return False
