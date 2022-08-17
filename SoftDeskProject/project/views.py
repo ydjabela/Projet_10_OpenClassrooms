@@ -1,7 +1,24 @@
-from rest_framework import viewsets, generics, status, renderers, response, permissions
+from rest_framework import (
+    viewsets,
+    generics,
+    status,
+    renderers,
+    response,
+    permissions
+)
 from project.models import Project, Contributor, Issue, Comment
-from project.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
-from project.permissions import IsProjectAuthor, IsContributor, IsIssueAuthor, IsCommentAuthor
+from project.serializers import (
+    ProjectSerializer,
+    ContributorSerializer,
+    IssueSerializer,
+    CommentSerializer
+)
+from project.permissions import (
+    IsProjectAuthor,
+    IsContributor,
+    IsIssueAuthor,
+    IsCommentAuthor
+)
 
 
 class projectViewset(viewsets.ModelViewSet):
@@ -18,7 +35,12 @@ class projectViewset(viewsets.ModelViewSet):
         description = request.data["description"]
         type = request.data["type"]
         serializer = ProjectSerializer(
-            data={"author_user": user_id, "title": title, "description": description, "type": type}
+            data={
+                "author_user": user_id,
+                "title": title,
+                "description": description,
+                "type": type
+            }
         )
 
         if serializer.is_valid():
@@ -39,15 +61,23 @@ class projectViewset(viewsets.ModelViewSet):
         type = request.data["type"]
 
         partial = kwargs.pop('partial', False)
-        instance = Project.objects.get(id=project_id)
-        data = {"author_user": author_user, "title": title, "description": description, "type": type}
-        serializer = self.get_serializer(
-            instance,
-            data=data,
-            partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return response.Response(serializer.data)
+        try:
+            instance = Project.objects.get(id=project_id)
+            data = {
+                "author_user": author_user,
+                "title": title,
+                "description": description,
+                "type": type
+            }
+            serializer = self.get_serializer(
+                instance,
+                data=data,
+                partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return response.Response(serializer.data)
+        except:
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class ContributorsListCreateView(generics.ListCreateAPIView):
@@ -72,7 +102,12 @@ class ContributorsListCreateView(generics.ListCreateAPIView):
         permission = request.data["permission"]
         role = request.data["role"]
         serializer = ContributorSerializer(
-            data={"user": user_id, "project": project_id, "permission": permission, "role": role}
+            data={
+                "user": user_id,
+                "project": project_id,
+                "permission": permission,
+                "role": role
+            }
         )
         if serializer.is_valid():
             self.perform_create(serializer)
@@ -95,7 +130,10 @@ class ContributorRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
         project_id = kwargs["project_id"]
         contributor_id = kwargs[self.lookup_field]
         try:
-            instance = Contributor.objects.get(project__id=project_id, user__id=contributor_id)
+            instance = Contributor.objects.get(
+                project__id=project_id,
+                user__id=contributor_id
+            )
             self.perform_destroy(instance)
             return response.Response(status=status.HTTP_204_NO_CONTENT)
         except:
@@ -107,7 +145,6 @@ class IssuesListCreateView(generics.ListCreateAPIView):
     renderer_classes = [renderers.JSONRenderer]
 
     permission_classes = [permissions.IsAuthenticated, IsContributor]
-    print(IsProjectAuthor, IsContributor)
     lookup_field = "project_id"
 
     def get_queryset(self):
@@ -178,24 +215,27 @@ class IssuesRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
         author_user = connected_user
         assignee_user = request.data["assignee_user"]
         partial = kwargs.pop('partial', False)
-        instance = Issue.objects.get(id=Issue_id, project__id=project_id)
-        data = {
-            "title": title,
-            "desc": desc,
-            "tag": tag,
-            "priority": priority,
-            "project": project_id,
-            "status": status_1,
-            "author_user": author_user,
-            "assignee_user": assignee_user
-        }
-        serializer = self.get_serializer(
-            instance,
-            data=data,
-            partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return response.Response(serializer.data)
+        try:
+            instance = Issue.objects.get(id=Issue_id, project__id=project_id)
+            data = {
+                "title": title,
+                "desc": desc,
+                "tag": tag,
+                "priority": priority,
+                "project": project_id,
+                "status": status_1,
+                "author_user": author_user,
+                "assignee_user": assignee_user
+            }
+            serializer = self.get_serializer(
+                instance,
+                data=data,
+                partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return response.Response(serializer.data)
+        except:
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class CommentListCreateView(generics.ListCreateAPIView):

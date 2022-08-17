@@ -69,4 +69,3 @@ urlpatterns = [
         name="project_comment_detail",
     ),
 ]
-
