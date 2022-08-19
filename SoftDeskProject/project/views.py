@@ -61,23 +61,20 @@ class projectViewset(viewsets.ModelViewSet):
         type = request.data["type"]
 
         partial = kwargs.pop('partial', False)
-        try:
-            instance = Project.objects.get(id=project_id)
-            data = {
-                "author_user": author_user,
-                "title": title,
-                "description": description,
-                "type": type
-            }
-            serializer = self.get_serializer(
-                instance,
-                data=data,
-                partial=partial)
-            serializer.is_valid(raise_exception=True)
-            self.perform_update(serializer)
-            return response.Response(serializer.data)
-        except:
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+        instance = Project.objects.get(id=project_id)
+        data = {
+            "author_user": author_user,
+            "title": title,
+            "description": description,
+            "type": type
+        }
+        serializer = self.get_serializer(
+            instance,
+            data=data,
+            partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return response.Response(serializer.data)
 
 
 class ContributorsListCreateView(generics.ListCreateAPIView):
@@ -129,15 +126,12 @@ class ContributorRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
     def delete(self, request, *args, **kwargs):
         project_id = kwargs["project_id"]
         contributor_id = kwargs[self.lookup_field]
-        try:
-            instance = Contributor.objects.get(
-                project__id=project_id,
-                user__id=contributor_id
-            )
-            self.perform_destroy(instance)
-            return response.Response(status=status.HTTP_204_NO_CONTENT)
-        except:
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+        instance = Contributor.objects.get(
+            project__id=project_id,
+            user__id=contributor_id
+        )
+        self.perform_destroy(instance)
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class IssuesListCreateView(generics.ListCreateAPIView):
@@ -196,12 +190,9 @@ class IssuesRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
     def delete(self, request, *args, **kwargs):
         project_id = kwargs["project_id"]
         Issue_id = kwargs[self.lookup_field]
-        try:
-            instance = Issue.objects.get(id=Issue_id, project__id=project_id)
-            self.perform_destroy(instance)
-            return response.Response(status=status.HTTP_204_NO_CONTENT)
-        except:
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+        instance = Issue.objects.get(id=Issue_id, project__id=project_id)
+        self.perform_destroy(instance)
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
 
     def update(self, request, *args, **kwargs):
         connected_user = self.request.user.id
@@ -215,27 +206,24 @@ class IssuesRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
         author_user = connected_user
         assignee_user = request.data["assignee_user"]
         partial = kwargs.pop('partial', False)
-        try:
-            instance = Issue.objects.get(id=Issue_id, project__id=project_id)
-            data = {
-                "title": title,
-                "desc": desc,
-                "tag": tag,
-                "priority": priority,
-                "project": project_id,
-                "status": status_1,
-                "author_user": author_user,
-                "assignee_user": assignee_user
-            }
-            serializer = self.get_serializer(
-                instance,
-                data=data,
-                partial=partial)
-            serializer.is_valid(raise_exception=True)
-            self.perform_update(serializer)
-            return response.Response(serializer.data)
-        except:
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+        instance = Issue.objects.get(id=Issue_id, project__id=project_id)
+        data = {
+            "title": title,
+            "desc": desc,
+            "tag": tag,
+            "priority": priority,
+            "project": project_id,
+            "status": status_1,
+            "author_user": author_user,
+            "assignee_user": assignee_user
+        }
+        serializer = self.get_serializer(
+            instance,
+            data=data,
+            partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return response.Response(serializer.data)
 
 
 class CommentListCreateView(generics.ListCreateAPIView):
@@ -254,30 +242,27 @@ class CommentListCreateView(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         issue_id = kwargs["Issue_id"]
         project_id = self.kwargs.get("project_id")
-        try:
-            issued = Issue.objects.get(id=issue_id, project__id__iexact=project_id)
-            connected_user = self.request.user.id
-            description = request.data["description"]
-            author_user = connected_user
-            serializer = CommentSerializer(
-                data={
-                    "description": description,
-                    "author_user": author_user,
-                    "issue": issued.id,
-                }
-            )
-            if serializer.is_valid():
-                self.perform_create(serializer)
-                headers = self.get_success_headers(serializer.data)
+        issued = Issue.objects.get(id=issue_id, project__id__iexact=project_id)
+        connected_user = self.request.user.id
+        description = request.data["description"]
+        author_user = connected_user
+        serializer = CommentSerializer(
+            data={
+                "description": description,
+                "author_user": author_user,
+                "issue": issued.id,
+            }
+        )
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
 
-                return response.Response(
-                    serializer.data,
-                    status=status.HTTP_201_CREATED,
-                    headers=headers,
-                )
-            return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except:
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED,
+                headers=headers,
+            )
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CommentRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
@@ -290,36 +275,30 @@ class CommentRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
         comment_id = kwargs[self.lookup_field]
         project_id = kwargs["project_id"]
         issue_id = self.kwargs["Issue_id"]
-        try:
-            issued = Issue.objects.get(id=issue_id, project__id__iexact=project_id)
-            instance = Comment.objects.get(id=comment_id, issue__id=issued.id)
-            self.perform_destroy(instance)
-            return response.Response(status=status.HTTP_204_NO_CONTENT)
-        except:
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+        issued = Issue.objects.get(id=issue_id, project__id__iexact=project_id)
+        instance = Comment.objects.get(id=comment_id, issue__id=issued.id)
+        self.perform_destroy(instance)
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
 
     def update(self, request, *args, **kwargs):
         connected_user = self.request.user.id
         comment_id = kwargs["Comment_id"]
         project_id = kwargs["project_id"]
         issue_id = kwargs["Issue_id"]
-        try:
-            issued = Issue.objects.get(id=issue_id, project__id__iexact=project_id)
-            description = request.data["description"]
-            author_user = connected_user
-            partial = kwargs.pop('partial', False)
-            instance = Comment.objects.get(id=comment_id, issue__id=issued.id)
-            data = {
-                    "description": description,
-                    "author_user": author_user,
-                    "issue": issued.id,
-                }
-            serializer = self.get_serializer(
-                instance,
-                data=data,
-                partial=partial)
-            serializer.is_valid(raise_exception=True)
-            self.perform_update(serializer)
-            return response.Response(serializer.data)
-        except:
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+        issued = Issue.objects.get(id=issue_id, project__id__iexact=project_id)
+        description = request.data["description"]
+        author_user = connected_user
+        partial = kwargs.pop('partial', False)
+        instance = Comment.objects.get(id=comment_id, issue__id=issued.id)
+        data = {
+                "description": description,
+                "author_user": author_user,
+                "issue": issued.id,
+            }
+        serializer = self.get_serializer(
+            instance,
+            data=data,
+            partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return response.Response(serializer.data)
