@@ -29,7 +29,6 @@ class IsContributor(BasePermission):
                 message = "contributor does'nt exist"
                 print(message)
                 return False
-
         else:
             return True
 
