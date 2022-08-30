@@ -40,7 +40,11 @@ pip install -r requirements.txt
 ```
 
 ### Fonctionnement:
-
+Une fois activé, pour démarrer le serveur local, il faudra utiliser la commande :
+```
+python manage.py runserver 
+```
+### Postman documentation
 
 #### Cette commande sera obligatoire à chaque fois que vous voudrez travailler avec le cours. Dans le même terminal, tapez maintenant
 ```
@@ -52,6 +56,6 @@ Pour lancer la vérification de la qualité du code :
 flake8 --format=html --htmldir=flake-report --exclude=env --max-line-length=119
 ```
 ### Contributeurs
-- Yacine Djabela 
+- Yacine Djabela
 - Stephane Didier
 

@@ -3,7 +3,6 @@ from authentification.serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
-from authentification.models import User
 # users/views.py
 
 
@@ -17,10 +16,3 @@ class CreateUserAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-class UsersAPIView(APIView):
-    def get(self, *args, **kwargs):
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
