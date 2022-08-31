@@ -46,6 +46,8 @@ python manage.py runserver
 ```
 ### Postman documentation
 
+Suivre les  indications detaillé dans le site suivant:
+https://documenter.getpostman.com/view/21036516/VUxNQ7dj
 #### Cette commande sera obligatoire à chaque fois que vous voudrez travailler avec le cours. Dans le même terminal, tapez maintenant
 ```
 pip install -r requirements.txt
