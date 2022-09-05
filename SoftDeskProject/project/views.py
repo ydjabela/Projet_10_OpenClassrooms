@@ -265,11 +265,21 @@ class CommentListCreateView(generics.ListCreateAPIView):
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class CommentRetrieveDeleteView(generics.RetrieveUpdateDestroyAPIView):
+class CommentRetrieveDeleteView(generics.ListCreateAPIView, generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CommentSerializer
     renderer_classes = [renderers.JSONRenderer]
     permission_classes = [permissions.IsAuthenticated, IsCommentAuthor]
     lookup_field = "Comment_id"
+
+    def get_queryset(self):
+        project_id = self.kwargs.get("project_id")
+        issue_id = self.kwargs["Issue_id"]
+        comment_id = self.kwargs[self.lookup_field]
+        issued = Issue.objects.get(id=issue_id, project__id__iexact=project_id)
+        return Comment.objects.filter(
+            id=comment_id,
+            issue__id__iexact=issued.id,
+        )
 
     def delete(self, request, *args, **kwargs):
         comment_id = kwargs[self.lookup_field]
