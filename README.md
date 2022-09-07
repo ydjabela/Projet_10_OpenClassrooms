@@ -31,7 +31,7 @@ Projet_10\Scripts\activate.bat
 
 MacOS/Linux :
 ```
-source Projet_9/bin/activate
+source Projet_10/bin/activate
 ```
 
 ### Installation des packages necessaire pour ce projet
